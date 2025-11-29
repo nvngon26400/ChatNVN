@@ -6,6 +6,8 @@ from typing import AsyncIterator
 
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from .chatbot import CustomerSupportChatbot
@@ -239,5 +241,18 @@ async def chat_ws(websocket: WebSocket) -> None:
 async def _stream_answer(question: str, session_id: str) -> AsyncIterator[str]:
     async for token in bot.astream(question, session_id=session_id):
         yield token
+
+# --- Serve frontend build (Vite) ---
+# Expect built assets under web/dist relative to project root (mock-project)
+from pathlib import Path as _Path
+_dist_dir = _Path("web/dist").resolve()
+if _dist_dir.exists():
+    # Mount at root; API remains under /api/*
+    app.mount("/", StaticFiles(directory=str(_dist_dir), html=True), name="frontend")
+else:
+    # Minimal placeholder when dist is missing
+    @app.get("/")
+    def _index_placeholder() -> dict:
+        return {"message": "Frontend not built. Run 'npm ci --prefix web && npm run build --prefix web'."}
 
 
