@@ -1,0 +1,79 @@
+## Customer Support Chatbot (LangChain + LangSmith)
+
+This mock project delivers an end-to-end customer support chatbot capable of:
+- indexing internal PDF and DOCX documents,
+- retrieving the most relevant snippets at question time,
+- responding with conversational memory, and
+- streaming traces to LangSmith for observability.
+
+### Project structure
+- `src/mock_project/` – core application modules (config, loaders, vector store, chatbot runtime).
+- `scripts/demo.py` – CLI demo that runs the chatbot locally.
+- `data/docs/` – place your internal knowledge base here (PDF/DOCX).
+- `tests/` – regression tests for document ingestion and conversational logic.
+- `report.md` – build notes and implementation retrospective.
+- `.env` – runtime secrets (API keys, LangSmith toggles).
+
+### Quick start
+1. **Install dependencies**
+   ```bash
+   cd mock-project
+   uv sync  # or: pip install -e .[dev]
+   ```
+2. **Add internal docs**
+   ```
+   data/docs/
+     ├── product_overview.pdf
+     └── service_catalog.docx
+   ```
+3. **Configure secrets**
+   ```
+   cp .env.example .env  # if you want a clean template
+   # fill in OPENAI_API_KEY + LangSmith keys
+   ```
+4. **Run the demo**
+   ```bash
+   uv run python -m scripts.demo
+   ```
+
+### Demo flow
+The CLI demo keeps a conversation loop:
+1. Ingests all PDF/DOCX files under `data/docs`.
+2. Splits text and builds a FAISS vector store with OpenAI embeddings.
+3. Uses a `ConversationalRetrievalChain` (ChatOpenAI + summary memory + custom prompt).
+4. Streams traces to LangSmith whenever `LANGCHAIN_TRACING_V2=true`.
+
+### Prompt & memory upgrades
+- Persona prompt enforced via `ChatPromptTemplate` để câu trả lời thân thiện, chỉ dựa trên tài liệu nội bộ, kèm hướng dẫn “không bịa”.
+- `ConversationSummaryBufferMemory` giữ ngữ cảnh dài bằng cách tóm tắt các lượt chat trước mà vẫn tiết kiệm token.
+- `ChatOpenAI` streaming + `AsyncIteratorCallbackHandler` giúp phát từng token cho UI realtime.
+
+### FastAPI + React web UI
+1. **Backend (streaming)**  
+   ```bash
+   uv run uvicorn mock_project.api:app --reload --port 8000
+   ```
+   - `POST /api/chat`: REST fallback (non-stream).  
+   - `WS /ws/chat`: gửi `{ "message": "..." }`, nhận luồng token (`type=token`) và sự kiện `done`.
+2. **Frontend (Vite + React)**  
+   ```bash
+   cd web
+   npm install
+   npm run dev  # http://localhost:5173
+   ```
+   React app sử dụng WebSocket để hiển thị typing effect, tự động fallback sang REST nếu socket chưa sẵn sàng. Tùy biến endpoint qua biến môi trường `VITE_API_URL` và `VITE_WS_URL`.
+
+### Testing
+Run all unit tests (they dynamically create temporary PDF/DOCX files so no fixtures are required):
+```bash
+uv run pytest
+```
+
+### Extending
+- Swap `ChatOpenAI` or embeddings in `config.py`.
+- Replace FAISS with self-hosted vector DBs by editing `vectorstore.py`.
+- Plug in calendaring or ticketing tools by extending `chatbot.py`.
+
+For implementation details and design trade-offs, see `report.md`.
+
+

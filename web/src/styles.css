@@ -1,0 +1,474 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+#root {
+  height: 100%;
+}
+
+.app {
+  width: 100%;
+  height: 100dvh;
+  display: flex;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+header {
+  text-align: center;
+}
+
+.status {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(99, 102, 241, 0.18);
+  color: #c7d2fe;
+  font-size: 13px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+#root {
+  height: 100%;
+}
+
+.app {
+  width: 100%;
+  height: 100dvh;
+  display: flex;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+header {
+  text-align: center;
+}
+
+.status {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(99, 102, 241, 0.18);
+  color: #c7d2fe;
+  font-size: 13px;
+}
+
+.status-modern {
+  background: linear-gradient(135deg, #6366f1 0%, #14b8a6 100%);
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(20, 184, 166, 0.25);
+}
+
+.chat-window {
+  flex: 1;
+  background: var(--bg);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  /* Space between messages */
+  padding: 20px;
+}
+
+.bubble {
+  max-width: 70%;
+  padding: 10px 16px;
+  border-radius: 18px;
+  line-height: 1.5;
+  position: relative;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  font-size: 15px;
+}
+
+.bubble.user {
+  align-self: flex-end;
+  background: var(--primary);
+  color: white;
+  border-bottom-right-radius: 4px;
+  /* Speech bubble tail effect */
+}
+
+.bubble.assistant {
+  align-self: flex-start;
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+  /* Speech bubble tail effect */
+}
+
+/* Markdown content adjustments for new bubble style */
+.markdown-content p {
+  margin: 0 0 6px 0;
+}
+
+.markdown-content pre {
+  background: rgba(0, 0, 0, 0.3);
+  /* Darker background for code blocks */
+  padding: 12px;
+  border-radius: 12px;
+  margin: 8px 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bubble.assistant .markdown-content pre {
+  background: rgba(0, 0, 0, 0.2);
+  /* Slightly lighter for assistant */
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Light theme overrides for code blocks */
+[data-theme="light"] .markdown-content pre {
+  background: #1e1e2e;
+  /* Keep code blocks dark even in light mode for contrast */
+  color: #e2e8f0;
+}
+
+[data-theme="light"] .bubble.assistant {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .bubble.user {
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+}
+
+.composer {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 16px 20px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.composer input {
+  flex: 1;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 24px;
+  /* Pill shape input */
+  padding: 12px 20px;
+  transition: border-color 0.2s;
+  font-size: 1rem;
+}
+
+.composer input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.composer button {
+  border-radius: 50%;
+  /* Circular button */
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  font-weight: 600;
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.composer button:hover {
+  transform: scale(1.05);
+}
+
+
+:root {
+  --sidebar-width: 280px;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  background: #1a1a2e;
+  border-right: 1px solid #2d2d44;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 500;
+  padding: 14px 20px;
+  background: rgba(26, 26, 46, 0.85);
+  border-bottom: 1px solid rgba(45, 45, 68, 0.7);
+  backdrop-filter: saturate(180%) blur(12px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #ffffff 0%, #c7d2fe 50%, #93c5fd 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.subtext {
+  margin: 0;
+  color: #9aa3b2;
+  font-size: 13px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mobile-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(37, 37, 56, 0.9);
+  border: 1px solid rgba(45, 45, 68, 0.8);
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  z-index: 900;
+}
+
+.overlay.show {
+  display: block;
+}
+
+.session-item {
+  padding: 12px;
+  margin-bottom: 8px;
+  background: #1a1a2e;
+}
+
+/* Mobile & tablet */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100dvh;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: 1000;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .mobile-toggle {
+    display: inline-flex;
+  }
+
+  .header {
+    padding: 12px 14px;
+  }
+
+  .header-content {
+    flex-wrap: wrap;
+  }
+
+  .app-title {
+    font-size: 20px;
+  }
+
+  .subtext {
+    font-size: 12px;
+  }
+
+  .bubble {
+    max-width: 85%;
+  }
+
+  .chat-window {
+    padding: 12px;
+  }
+
+  .composer {
+    gap: 0.5rem;
+    padding: 12px 14px;
+    flex-wrap: wrap;
+  }
+
+  .composer button {
+    width: 48px;
+    /* Keep circular button size */
+    height: 48px;
+  }
+}
+
+/* Medium screens (iPad landscape / small laptops) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .bubble {
+    max-width: 80%;
+  }
+
+  .composer {
+    padding: 14px 18px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 769px) {
+  .overlay {
+    display: none !important;
+  }
+
+  .sidebar {
+    position: relative;
+    height: auto;
+    transform: none;
+    z-index: auto;
+  }
+}
+
+/* ===================== */
+/* Theme system (appended overrides) */
+/* ===================== */
+
+:root {
+  --bg: #0f172a;
+  --surface: #1a1a2e;
+  --surface-2: #252538;
+  --border: #2d2d44;
+  --text: #e2e8f0;
+  --muted: #9aa3b2;
+  --primary: #2563eb;
+  --gradient-1: #6366f1;
+  --gradient-2: #14b8a6;
+  --accent-1: rgba(15, 118, 110, 0.3);
+  --accent-border: rgba(45, 212, 191, 0.4);
+  --overlay: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] {
+  /* Softer, low-glare palette */
+  --bg: #f6f7fb;
+  --surface: #ffffff;
+  --surface-2: #f2f5fa;
+  --border: #e6eaf0;
+  --text: #0f172a;
+  --muted: #4b5563;
+  --primary: #4c7ef3;
+  --gradient-1: #7aa2f7;
+  --gradient-2: #4fd1c5;
+  --accent-1: rgba(15, 118, 110, 0.06);
+  --accent-border: rgba(20, 184, 166, 0.28);
+  --overlay: rgba(15, 23, 42, 0.25);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+}
+
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.subtext {
+  color: var(--muted);
+}
+
+.chat-window {
+  background: var(--bg);
+}
+
+.composer {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.composer input {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.composer button {
+  background: var(--primary);
+}
+
+.mobile-toggle {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.overlay {
+  background: var(--overlay);
+}
