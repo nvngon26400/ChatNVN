@@ -22,6 +22,11 @@ app.add_middleware(
 )
 
 bot = CustomerSupportChatbot()
+try:
+    bot.init_index()
+except Exception:
+    # Nếu prewarm thất bại, tiếp tục khởi chạy API và sẽ lazy-init khi cần
+    pass
 
 
 class ChatRequest(BaseModel):

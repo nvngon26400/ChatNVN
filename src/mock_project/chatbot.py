@@ -24,15 +24,35 @@ class CustomerSupportChatbot:
         self.settings = settings or get_settings()
         self._retriever = None
         self._prompt = _build_prompt()
+        self._answer_cache: dict[str, str] = {}
+
+    def init_index(self) -> None:
+        """Initialize retriever with optional FAISS persistence to reduce cold-start latency."""
+        if self._retriever:
+            return
+        builder = VectorStoreBuilder(self.settings)
+        vector_store = None
+        try:
+            if self.settings.persist_index and not self.settings.reindex_on_start:
+                persist_path = self.settings.persist_index_path
+                if persist_path.exists():
+                    vector_store = builder.load_from_disk(persist_path)
+        except Exception:
+            vector_store = None
+
+        if vector_store is None:
+            documents = load_documents(self.settings)
+            chunks = split_documents(self.settings, documents)
+            if self.settings.persist_index:
+                vector_store = builder.build(chunks, persist_path=self.settings.persist_index_path)
+            else:
+                vector_store = builder.build(chunks)
+
+        self._retriever = get_retriever(vector_store, k=self.settings.retriever_k)
 
     def _get_retriever(self):
-        if self._retriever:
-            return self._retriever
-
-        documents = load_documents(self.settings)
-        chunks = split_documents(self.settings, documents)
-        vector_store = VectorStoreBuilder(self.settings).build(chunks)
-        self._retriever = get_retriever(vector_store)
+        if not self._retriever:
+            self.init_index()
         return self._retriever
 
     def build_chain(self, session_id: str = "default") -> ConversationalRetrievalChain:
@@ -69,16 +89,31 @@ class CustomerSupportChatbot:
             return "Vui lòng nhập câu hỏi hợp lệ."
 
         try:
+            cache_key = f"{session_id}|{question.strip().lower()}"
+            if cache_key in self._answer_cache:
+                return self._answer_cache[cache_key]
             # Fallback: nếu không có dữ liệu nội bộ, gọi trực tiếp OpenAI
             if not self.settings.docs_exist:
                 answer = self._ask_openai_direct(question)
                 self._append_history(session_id, question, answer)
+                self._answer_cache[cache_key] = answer
                 return answer
 
             chain = self.build_chain(session_id=session_id)
             response = chain.invoke({"question": question})
-            return response.get("answer", "Xin lỗi, không thể tạo phản hồi.")
+            answer = response.get("answer", "Xin lỗi, không thể tạo phản hồi.")
+            self._answer_cache[cache_key] = answer
+            return answer
         except Exception as e:  # noqa: BLE001
+            # Nếu lỗi liên quan đến token counting/model không được hỗ trợ, fallback gọi trực tiếp
+            if "get_num_tokens_from_messages" in str(e) or "tiktoken" in str(e):
+                try:
+                    answer = self._ask_openai_direct(question)
+                    self._append_history(session_id, question, answer)
+                    self._answer_cache[cache_key] = answer
+                    return answer
+                except Exception:
+                    pass
             import traceback
             error_msg = f"Lỗi khi xử lý câu hỏi: {str(e)}"
             print(f"Chatbot error: {error_msg}\n{traceback.format_exc()}")
@@ -124,6 +159,9 @@ class CustomerSupportChatbot:
             api_key=self.settings.openai_api_key,
             streaming=streaming,
             callbacks=callbacks or [],
+            max_tokens=self.settings.max_tokens,
+            timeout=self.settings.llm_timeout,
+            max_retries=self.settings.llm_max_retries,
         )
 
     def _ask_openai_direct(self, question: str) -> str:
