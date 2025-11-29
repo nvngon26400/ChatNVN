@@ -19,7 +19,11 @@ type Session = {
 };
 
 const randomId = () => crypto.randomUUID();
-const API_BASE = (import.meta.env.VITE_API_URL?.replace("/api/chat", "") as string) || "";
+const isLocal = typeof window !== 'undefined' &&
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const API_BASE = isLocal
+  ? ((import.meta.env.VITE_API_URL?.replace("/api/chat", "") as string) || "")
+  : "";
 
 function App() {
   const [messages, setMessages] = useState<Message[]>([]);
