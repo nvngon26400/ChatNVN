@@ -1,0 +1,1 @@
+web: uvicorn src.mock_project.api:app --host 0.0.0.0 --port $PORT
