@@ -107,6 +107,22 @@ header {
   font-size: 15px;
 }
 
+/* Limit very long messages and add internal scrolling */
+.bubble .markdown-content {
+  max-height: 45vh;
+  overflow-y: auto;
+}
+
+/* Improve code blocks readability and prevent layout break */
+.markdown-content pre {
+  overflow: auto;
+}
+
+.markdown-content img, .markdown-content video, .markdown-content iframe {
+  max-width: 100%;
+  height: auto;
+}
+
 .bubble.user {
   align-self: flex-end;
   background: var(--primary);
@@ -346,6 +362,11 @@ header {
 
   .bubble {
     max-width: 85%;
+  }
+
+  /* On mobile, make bubble scroll area slightly taller */
+  .bubble .markdown-content {
+    max-height: 55vh;
   }
 
   .chat-window {
